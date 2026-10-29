@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Matrix Rain Customizer</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              matrix: {
+                500: "#22c55e",
+                900: "#052e16",
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .code-font {
+        font-family: "JetBrains Mono", monospace;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-zinc-950 text-zinc-100 h-screen flex flex-col overflow-hidden"
+  >
+    <!-- Top Navigation Bar -->
+    <header
+      class="bg-zinc-900 border-b border-zinc-800 px-6 py-4 flex items-center justify-between shrink-0 shadow-lg"
+    >
+      <div class="flex items-center space-x-3">
+        <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+        <h1 class="text-xl font-bold tracking-wider text-green-400 code-font">
+          MATRIX_CUSTOMIZER v2.0
+        </h1>
+      </div>
+      <div class="text-xs text-zinc-400 code-font hidden sm:block">
+        Adjust sliders below to fine-tune spacing, speed, and density instantly.
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="flex-1 flex flex-col lg:flex-row relative overflow-hidden">
+      <!-- Canvas Area -->
+      <div
+        class="flex-1 relative bg-black flex items-center justify-center overflow-hidden"
+      >
+        <canvas
+          id="matrixCanvas"
+          class="absolute inset-0 w-full h-full block"
+        ></canvas>
+
+        <!-- Floating status overlay -->
+        <div
+          class="absolute bottom-4 left-4 bg-zinc-900/80 backdrop-blur border border-zinc-800 rounded-lg p-3 text-xs code-font text-zinc-300 pointer-events-none shadow-xl"
+        >
+          <div>FPS: <span id="statFps" class="text-green-400">60</span></div>
+          <div>
+            Active Drops: <span id="statDrops" class="text-green-400">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Control Panel -->
+      <aside
+        class="w-full lg:w-96 bg-zinc-900 border-t lg:border-t-0 lg:border-l border-zinc-800 p-6 flex flex-col space-y-6 overflow-y-auto shrink-0 shadow-2xl"
+      >
+        <h2
+          class="text-sm font-semibold tracking-wide text-zinc-400 uppercase code-font border-b border-zinc-800 pb-2"
+        >
+          Animation Parameters
+        </h2>
+
+        <!-- Horizontal Spacing (Indents / Column Gaps) -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center text-sm">
+            <label for="colSpacing" class="font-medium text-zinc-200"
+              >Horizontal Spacing (Gap)</label
+            >
+            <span
+              id="colSpacingVal"
+              class="code-font text-green-400 bg-zinc-950 px-2 py-0.5 rounded border border-zinc-800 text-xs"
+              >20px</span
+            >
+          </div>
+          <input
+            id="colSpacing"
+            type="range"
+            min="10"
+            max="60"
+            value="20"
+            class="w-full accent-green-500 bg-zinc-800 rounded-lg h-2 cursor-pointer"
+          />
+          <p class="text-xs text-zinc-500">
+            Controls column distance (indents) across the screen.
+          </p>
+        </div>
+
+        <!-- Font Size -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center text-sm">
+            <label for="fontSize" class="font-medium text-zinc-200"
+              >Font Size</label
+            >
+            <span
+              id="fontSizeVal"
+              class="code-font text-green-400 bg-zinc-950 px-2 py-0.5 rounded border border-zinc-800 text-xs"
+              >16px</span
+            >
+          </div>
+          <input
+            id="fontSize"
+            type="range"
+            min="10"
+            max="36"
+            value="16"
+            class="w-full accent-green-500 bg-zinc-800 rounded-lg h-2 cursor-pointer"
+          />
+        </div>
+
+        <!-- Fall Speed -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center text-sm">
+            <label for="fallSpeed" class="font-medium text-zinc-200"
+              >Fall Speed</label
+            >
+            <span
+              id="fallSpeedVal"
+              class="code-font text-green-400 bg-zinc-950 px-2 py-0.5 rounded border border-zinc-800 text-xs"
+              >1.5x</span
+            >
+          </div>
+          <input
+            id="fallSpeed"
+            type="range"
+            min="0.5"
+            max="4.0"
+            step="0.1"
+            value="1.5"
+            class="w-full accent-green-500 bg-zinc-800 rounded-lg h-2 cursor-pointer"
+          />
+        </div>
+
+        <!-- Trail Fade / Opacity -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center text-sm">
+            <label for="trailFade" class="font-medium text-zinc-200"
+              >Trail Persistence</label
+            >
+            <span
+              id="trailFadeVal"
+              class="code-font text-green-400 bg-zinc-950 px-2 py-0.5 rounded border border-zinc-800 text-xs"
+              >0.10</span
+            >
+          </div>
+          <input
+            id="trailFade"
+            type="range"
+            min="0.02"
+            max="0.30"
+            step="0.01"
+            value="0.10"
+            class="w-full accent-green-500 bg-zinc-800 rounded-lg h-2 cursor-pointer"
+          />
+        </div>
+
+        <!-- Theme Color Selector -->
+        <div class="space-y-2">
+          <label class="text-sm font-medium text-zinc-200">Color Palette</label>
+          <div class="grid grid-cols-4 gap-2">
+            <button
+              onclick="setTheme('#22c55e', '#ffffff')"
+              class="h-10 rounded-lg bg-green-500 border-2 border-transparent hover:border-white transition shadow flex items-center justify-center text-xs font-bold text-black"
+            >
+              Green
+            </button>
+            <button
+              onclick="setTheme('#06b6d4', '#ffffff')"
+              class="h-10 rounded-lg bg-cyan-500 border-2 border-transparent hover:border-white transition shadow flex items-center justify-center text-xs font-bold text-black"
+            >
+              Cyber
+            </button>
+            <button
+              onclick="setTheme('#ef4444', '#ffffff')"
+              class="h-10 rounded-lg bg-red-500 border-2 border-transparent hover:border-white transition shadow flex items-center justify-center text-xs font-bold text-black"
+            >
+              Blood
+            </button>
+            <button
+              onclick="setTheme('#eab308', '#ffffff')"
+              class="h-10 rounded-lg bg-yellow-500 border-2 border-transparent hover:border-white transition shadow flex items-center justify-center text-xs font-bold text-black"
+            >
+              Amber
+            </button>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="pt-4 border-t border-zinc-800 flex space-x-3">
+          <button
+            id="resetBtn"
+            class="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 py-2.5 px-4 rounded-lg text-sm font-medium transition shadow"
+          >
+            Reset Defaults
+          </button>
+          <button
+            id="pauseBtn"
+            class="flex-1 bg-green-600 hover:bg-green-500 text-black font-semibold py-2.5 px-4 rounded-lg text-sm transition shadow"
+          >
+            Pause Rain
+          </button>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Script Logic -->
+    <script>
+      const canvas = document.getElementById("matrixCanvas");
+      const ctx = canvas.getContext("2d");
+
+      // Inputs
+      const colSpacingInput = document.getElementById("colSpacing");
+      const colSpacingVal = document.getElementById("colSpacingVal");
+      const fontSizeInput = document.getElementById("fontSize");
+      const fontSizeVal = document.getElementById("fontSizeVal");
+      const fallSpeedInput = document.getElementById("fallSpeed");
+      const fallSpeedVal = document.getElementById("fallSpeedVal");
+      const trailFadeInput = document.getElementById("trailFade");
+      const trailFadeVal = document.getElementById("trailFadeVal");
+      const resetBtn = document.getElementById("resetBtn");
+      const pauseBtn = document.getElementById("pauseBtn");
+      const statDrops = document.getElementById("statDrops");
+
+      let isPaused = false;
+      let primaryColor = "#22c55e";
+      let headColor = "#ffffff";
+
+      // Character set
+      const chars =
+        "日ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+      let drops = [];
+
+      function resizeCanvas() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+        initDrops();
+      }
+
+      function initDrops() {
+        drops = [];
+        const colWidth = parseInt(colSpacingInput.value);
+        const columns = Math.floor(canvas.width / colWidth);
+
+        for (let i = 0; i < columns; i++) {
+          drops.push({
+            x: i * colWidth,
+            y: Math.random() * canvas.height - canvas.height,
+            speed: (Math.random() * 2 + 1) * parseFloat(fallSpeedInput.value),
+          });
+        }
+        statDrops.textContent = drops.length;
+      }
+
+      function setTheme(pColor, hColor) {
+        primaryColor = pColor;
+        headColor = hColor;
+      }
+
+      // Event Listeners for UI
+      colSpacingInput.addEventListener("input", (e) => {
+        colSpacingVal.textContent = e.target.value + "px";
+        initDrops();
+      });
+
+      fontSizeInput.addEventListener("input", (e) => {
+        fontSizeVal.textContent = e.target.value + "px";
+      });
+
+      fallSpeedInput.addEventListener("input", (e) => {
+        fallSpeedVal.textContent = parseFloat(e.target.value).toFixed(1) + "x";
+      });
+
+      trailFadeInput.addEventListener("input", (e) => {
+        trailFadeVal.textContent = parseFloat(e.target.value).toFixed(2);
+      });
+
+      resetBtn.addEventListener("click", () => {
+        colSpacingInput.value = 20;
+        colSpacingVal.textContent = "20px";
+        fontSizeInput.value = 16;
+        fontSizeVal.textContent = "16px";
+        fallSpeedInput.value = 1.5;
+        fallSpeedVal.textContent = "1.5x";
+        trailFadeInput.value = 0.1;
+        trailFadeVal.textContent = "0.10";
+        setTheme("#22c55e", "#ffffff");
+        initDrops();
+      });
+
+      pauseBtn.addEventListener("click", () => {
+        isPaused = !isPaused;
+        pauseBtn.textContent = isPaused ? "Resume Rain" : "Pause Rain";
+        pauseBtn.classList.toggle("bg-green-600", !isPaused);
+        pauseBtn.classList.toggle("bg-yellow-500", isPaused);
+      });
+
+      window.addEventListener("resize", resizeCanvas);
+
+      // Animation Loop
+      let lastTime = performance.now();
+      function draw(currentTime) {
+        const deltaTime = currentTime - lastTime;
+        lastTime = currentTime;
+
+        if (!isPaused) {
+          const fadeAlpha = parseFloat(trailFadeInput.value);
+          ctx.fillStyle = `rgba(0, 0, 0, ${fadeAlpha})`;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          const fontSize = parseInt(fontSizeInput.value);
+          const speedMult = parseFloat(fallSpeedInput.value);
+          ctx.font = `${fontSize}px 'JetBrains Mono', monospace`;
+
+          drops.forEach((drop) => {
+            // Draw random character
+            const text = chars.charAt(Math.floor(Math.random() * chars.length));
+
+            // Draw head in bright color
+            ctx.fillStyle = headColor;
+            ctx.fillText(text, drop.x, drop.y);
+
+            // Move drop down
+            drop.y += fontSize * speedMult * 0.15;
+
+            // Reset when off screen
+            if (drop.y > canvas.height && Math.random() > 0.975) {
+              drop.y = 0 - fontSize;
+              drop.speed = (Math.random() * 2 + 1) * speedMult;
+            }
+          });
+        }
+
+        requestAnimationFrame(draw);
+      }
+
+      // Initialize on load
+      resizeCanvas();
+      requestAnimationFrame(draw);
+    </script>
+  </body>
+</html>
